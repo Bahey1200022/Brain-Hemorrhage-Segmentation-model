@@ -58,7 +58,7 @@ def main():
     trained_model = train_model(train_loader, val_loader, config.num_epochs, config.learning_rate, config.device)
 
     # Save the model
-    torch.save(trained_model.state_dict(), 'trialdensenet.pth')
+    torch.save(trained_model.state_dict(), 'trial_TL1.pth')
 
     # Evaluate the model
     #evaluate_model(trained_model, test_loader, config.device)
@@ -66,7 +66,7 @@ def main():
     model = UNet().to(config.device)
 
     # Load the saved state dictionary
-    model.load_state_dict(torch.load('trialpaper1.pth', map_location=config.device))
+    model.load_state_dict(torch.load('trial_TL1.pth', map_location=config.device))
 
     # Evaluate the model
     evaluate_model(model, test_loader, config.device)
