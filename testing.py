@@ -59,7 +59,7 @@ def display_images(original_image, original_mask, output_mask):
     plt.show()
 
 if __name__ == "__main__":
-    model_path = 'trial3.pth'
+    model_path = 'trial_TL1.pth'
     image_path = r'C:\Users\moham\OneDrive\Desktop\test\dataset\png_volumes\ID_e3db11e0_ID_1863688c5b.nii\slice_016.png'
     mask_path = r'C:\Users\moham\OneDrive\Desktop\test\dataset\png_masks\ID_e3db11e0_ID_1863688c5b.nii\slice_016.png'
     output_path = 'path_to_save_segmentation.png'
