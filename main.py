@@ -5,6 +5,7 @@ from train import train_model
 import config
 from torchvision import transforms
 import numpy as np
+import segmentation_models_pytorch as smp
 
 def evaluate_model(model, test_loader, device):
     model.eval()
@@ -55,15 +56,20 @@ def main():
     train_loader, val_loader, test_loader = get_dataloaders(config.train_dir, batch_size=16, image_transform=image_transform, mask_transform=mask_transform)
 
     # Train model
-    trained_model = train_model(train_loader, val_loader, config.num_epochs, config.learning_rate, config.device)
+    # trained_model = train_model(train_loader, val_loader, config.num_epochs, config.learning_rate, config.device)
 
-    # Save the model
-    torch.save(trained_model.state_dict(), 'trial_TL2.pth')
+    # # Save the model
+    # torch.save(trained_model.state_dict(), 'trial_TL2.pth')
 
     # Evaluate the model
     #evaluate_model(trained_model, test_loader, config.device)
       # Load the model architecture
-    model = UNet().to(config.device)
+    model = smp.Unet(
+        encoder_name="resnet34",        # Choose encoder, e.g., resnet34, mobilenet_v2, efficientnet-b7, etc.
+        encoder_weights="imagenet",     # Use 'imagenet' pre-trained weights for encoder initialization
+        in_channels=3,                  # Model input channels (1 for gray-scale images, 3 for RGB, etc.)
+        classes=1                       # Model output channels (number of classes in your dataset)
+    ).to(config.device)
 
     # Load the saved state dictionary
     model.load_state_dict(torch.load('trial_TL2.pth', map_location=config.device))

@@ -2,12 +2,19 @@
 import torch
 import numpy as np
 import cv2
+import config
 from model import UNet
 from torchvision import transforms
 import matplotlib.pyplot as plt
+import segmentation_models_pytorch as smp
 
 def load_model(model_path, device):
-    model = UNet().to(device)
+    model = smp.Unet(
+        encoder_name="resnet34",        # Choose encoder, e.g., resnet34, mobilenet_v2, efficientnet-b7, etc.
+        encoder_weights="imagenet",     # Use 'imagenet' pre-trained weights for encoder initialization
+        in_channels=3,                  # Model input channels (1 for gray-scale images, 3 for RGB, etc.)
+        classes=1                       # Model output channels (number of classes in your dataset)
+    ).to(config.device)
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
     return model
@@ -59,7 +66,7 @@ def display_images(original_image, original_mask, output_mask):
     plt.show()
 
 if __name__ == "__main__":
-    model_path = 'trial_TL1.pth'
+    model_path = 'trial_TL2.pth'
     image_path = r'C:\Users\moham\OneDrive\Desktop\test\dataset\png_volumes\ID_e3db11e0_ID_1863688c5b.nii\slice_016.png'
     mask_path = r'C:\Users\moham\OneDrive\Desktop\test\dataset\png_masks\ID_e3db11e0_ID_1863688c5b.nii\slice_016.png'
     output_path = 'path_to_save_segmentation.png'
