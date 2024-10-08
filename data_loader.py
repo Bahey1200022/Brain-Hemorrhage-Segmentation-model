@@ -44,12 +44,12 @@ class BrainHemorrhageDataset(Dataset):
 
         return image, mask
 
-def get_dataloaders(data_dir, batch_size=16, image_transform=None, mask_transform=None, val_split=0.2, test_split=0.1):
+def get_dataloaders(data_dir, batch_size=16, train_image_transform=None, val_image_transform=None, train_mask_transform=None, val_mask_transform=None, val_split=0.2, test_split=0.1):
     full_dataset = BrainHemorrhageDataset(
         os.path.join(data_dir, 'png_volumes'),
         os.path.join(data_dir, 'png_masks'),
-        image_transform=image_transform,
-        mask_transform=mask_transform
+        image_transform=None,
+        mask_transform=None
     )
 
     test_size = int(len(full_dataset) * test_split)
@@ -57,6 +57,14 @@ def get_dataloaders(data_dir, batch_size=16, image_transform=None, mask_transfor
     train_size = len(full_dataset) - val_size - test_size
 
     train_dataset, val_dataset, test_dataset = random_split(full_dataset, [train_size, val_size, test_size])
+    
+     # Apply transformations to the train dataset
+    train_dataset.dataset.image_transform = train_image_transform
+    train_dataset.dataset.mask_transform = train_mask_transform
+
+    # Apply transformations to the validation dataset
+    val_dataset.dataset.image_transform = val_image_transform
+    val_dataset.dataset.mask_transform = val_mask_transform
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)

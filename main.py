@@ -40,30 +40,54 @@ def evaluate_model(model, test_loader, device):
 
 def main():
     # Data augmentation and transformation for images
-    image_transform = transforms.Compose([
+    train_image_transform = transforms.Compose([
+        transforms.RandomHorizontalFlip(),  # Randomly flip the image horizontally
+        transforms.RandomVerticalFlip(),    # Randomly flip the image vertically
+        transforms.RandomRotation(30),      # Randomly rotate the image by up to 30 degrees
+        transforms.RandomResizedCrop(256, scale=(0.8, 1.0)),  # Randomly crop and resize the image
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),  # Randomly change brightness, contrast, etc.
+        transforms.ToTensor(),              # Convert the image to a tensor
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize the image
+    ])
+
+    val_image_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Resize((256, 256)),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
     # Data augmentation and transformation for masks
-    mask_transform = transforms.Compose([
+    train_mask_transform = transforms.Compose([
+        transforms.RandomHorizontalFlip(),  # Randomly flip the mask horizontally
+        transforms.RandomVerticalFlip(),    # Randomly flip the mask vertically
+        transforms.RandomRotation(30),      # Randomly rotate the mask by up to 30 degrees
+        transforms.RandomResizedCrop(256, scale=(0.8, 1.0)),  # Randomly crop and resize the mask
+        transforms.ToTensor(),              # Convert the mask to a tensor
+        transforms.Resize((256, 256))       # Resize the mask
+    ])
+
+    val_mask_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Resize((256, 256))
     ])
 
     # Load data
-    train_loader, val_loader, test_loader = get_dataloaders(config.train_dir, batch_size=16, image_transform=image_transform, mask_transform=mask_transform)
+    train_loader, val_loader, test_loader = get_dataloaders(
+        config.train_dir, 
+        batch_size=16, 
+        train_image_transform=train_image_transform, 
+        val_image_transform=val_image_transform, 
+        train_mask_transform=train_mask_transform, 
+        val_mask_transform=val_mask_transform
+    )
 
     # Train model
-    # trained_model = train_model(train_loader, val_loader, config.num_epochs, config.learning_rate, config.device)
+    trained_model = train_model(train_loader, val_loader, config.num_epochs, config.learning_rate, config.device)
 
-    # # Save the model
-    # torch.save(trained_model.state_dict(), 'trial_TL2.pth')
+    # Save the model
+    torch.save(trained_model.state_dict(), 'trial_TL2_augmented.pth')
 
-    # Evaluate the model
-    #evaluate_model(trained_model, test_loader, config.device)
-      # Load the model architecture
+    # Load the model architecture
     model = smp.Unet(
         encoder_name="resnet34",        # Choose encoder, e.g., resnet34, mobilenet_v2, efficientnet-b7, etc.
         encoder_weights="imagenet",     # Use 'imagenet' pre-trained weights for encoder initialization
@@ -72,7 +96,7 @@ def main():
     ).to(config.device)
 
     # Load the saved state dictionary
-    model.load_state_dict(torch.load('trial_TL2.pth', map_location=config.device))
+    model.load_state_dict(torch.load('trial_TL2_augmented.pth', map_location=config.device))
 
     # Evaluate the model
     evaluate_model(model, test_loader, config.device)
