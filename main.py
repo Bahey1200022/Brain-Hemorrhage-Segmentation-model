@@ -85,18 +85,18 @@ def main():
     trained_model = train_model(train_loader, val_loader, config.num_epochs, config.learning_rate, config.device)
 
     # Save the model
-    torch.save(trained_model.state_dict(), 'trial_TL2_augmented2.pth')
+    torch.save(trained_model.state_dict(), 'trial_TL3_mobilenet.pth')
 
     # Load the model architecture
     model = smp.Unet(
-        encoder_name="resnet34",        # Choose encoder, e.g., resnet34, mobilenet_v2, efficientnet-b7, etc.
+        encoder_name="mobilenet_v2",        # Choose encoder, e.g., resnet34, mobilenet_v2, efficientnet-b7, etc.
         encoder_weights="imagenet",     # Use 'imagenet' pre-trained weights for encoder initialization
         in_channels=3,                  # Model input channels (1 for gray-scale images, 3 for RGB, etc.)
         classes=1                       # Model output channels (number of classes in your dataset)
     ).to(config.device)
 
     # Load the saved state dictionary
-    model.load_state_dict(torch.load('trial_TL2_augmented2.pth', map_location=config.device))
+    model.load_state_dict(torch.load('trial_TL3_mobilenet.pth', map_location=config.device))
 
     # Evaluate the model
     evaluate_model(model, test_loader, config.device)
