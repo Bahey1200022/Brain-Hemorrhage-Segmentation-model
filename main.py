@@ -85,7 +85,7 @@ def main():
     trained_model = train_model(train_loader, val_loader, config.num_epochs, config.learning_rate, config.device)
 
     # Save the model
-    torch.save(trained_model.state_dict(), 'trial_TL2_augmented.pth')
+    torch.save(trained_model.state_dict(), 'trial_TL2_augmented2.pth')
 
     # Load the model architecture
     model = smp.Unet(
@@ -96,7 +96,7 @@ def main():
     ).to(config.device)
 
     # Load the saved state dictionary
-    model.load_state_dict(torch.load('trial_TL2_augmented.pth', map_location=config.device))
+    model.load_state_dict(torch.load('trial_TL2_augmented2.pth', map_location=config.device))
 
     # Evaluate the model
     evaluate_model(model, test_loader, config.device)
