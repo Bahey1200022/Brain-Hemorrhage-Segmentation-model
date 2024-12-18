@@ -1,3 +1,8 @@
 dataset/
-
+images/
 label_192/
+labels/
+trial_TL2_augmented.pth
+trial_TL2_augmented2.pth
+trial_TL2.pth
+trial_TL3_mobilenet.pth
