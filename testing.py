@@ -1,4 +1,4 @@
-# segment.py
+import os
 import torch
 import numpy as np
 import cv2
@@ -10,7 +10,7 @@ import segmentation_models_pytorch as smp
 
 def load_model(model_path, device):
     model = smp.Unet(
-        encoder_name="resnet34",        # Choose encoder, e.g., resnet34, mobilenet_v2, efficientnet-b7, etc.
+        encoder_name="mobilenet_v2",        # Choose encoder, e.g., resnet34, mobilenet_v2, efficientnet-b7, etc.
         encoder_weights="imagenet",     # Use 'imagenet' pre-trained weights for encoder initialization
         in_channels=3,                  # Model input channels (1 for gray-scale images, 3 for RGB, etc.)
         classes=1                       # Model output channels (number of classes in your dataset)
@@ -65,27 +65,35 @@ def display_images(original_image, original_mask, output_mask):
     
     plt.show()
 
+def process_folder(model, input_folder, output_folder, device):
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+    
+    for filename in os.listdir(input_folder):
+        if filename.endswith('.png'):
+            image_path = os.path.join(input_folder, filename)
+            output_path = os.path.join(output_folder, filename)
+            
+            # Preprocess the input image
+            image_tensor, original_image = preprocess_image(image_path)
+            
+            # Perform segmentation
+            output_mask = segment_image(model, image_tensor, device)
+            
+            # Save the segmentation result
+            save_segmentation(output_mask, output_path)
+            
+            # Optionally display the images
+            # display_images(original_image, None, output_mask)
+
 if __name__ == "__main__":
-    model_path = 'trial_TL2.pth'
-    image_path = r'C:\Users\moham\OneDrive\Desktop\test\dataset\png_volumes\ID_e3db11e0_ID_1863688c5b.nii\slice_016.png'
-    mask_path = r'C:\Users\moham\OneDrive\Desktop\test\dataset\png_masks\ID_e3db11e0_ID_1863688c5b.nii\slice_016.png'
-    output_path = 'path_to_save_segmentation.png'
+    model_path = 'trial_TL3_mobilenet.pth'
+    input_folder = r'C:\Users\moham\OneDrive\Desktop\test\dataset\png_volumes\ID_0c3eef60_ID_6994ad7df0.nii'
+    output_folder = r'C:\Users\moham\OneDrive\Desktop\test\dataset\predicted_masks'
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Load the model
     model = load_model(model_path, device)
 
-    # Preprocess the input image
-    image_tensor, original_image = preprocess_image(image_path)
-
-    # Preprocess the original mask
-    original_mask = preprocess_mask(mask_path)
-
-    # Perform segmentation
-    output_mask = segment_image(model, image_tensor, device)
-
-    # Save the segmentation result
-    save_segmentation(output_mask, output_path)
-
-    # Display the original image, original mask, and segmented image side by side
-    display_images(original_image, original_mask, output_mask)
+    # Process the folder of images
+    process_folder(model, input_folder, output_folder, device)

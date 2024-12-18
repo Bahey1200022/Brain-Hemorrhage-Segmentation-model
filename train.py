@@ -7,7 +7,7 @@ import segmentation_models_pytorch as smp
 def train_model(train_loader, val_loader, num_epochs, learning_rate, device):
     # Initialize the model from segmentation_models_pytorch
     model = smp.Unet(
-        encoder_name="resnet34",        # Choose encoder, e.g., resnet34, mobilenet_v2, efficientnet-b7, etc.
+        encoder_name="mobilenet_v2",        # Choose encoder, e.g., resnet34, mobilenet_v2, efficientnet-b7, etc.
         encoder_weights="imagenet",     # Use 'imagenet' pre-trained weights for encoder initialization
         in_channels=3,                  # Model input channels (1 for gray-scale images, 3 for RGB, etc.)
         classes=1                       # Model output channels (number of classes in your dataset)
